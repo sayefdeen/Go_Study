@@ -11,11 +11,14 @@ Go is focusing in building servers and web applications, not client applications
 2. Excellent community
 
 3. Key features
+
    - Simplicity
    - Fast compile times
    - Garbage colleted
    - Build-in concurrency
    - Compile to standalone binaries
+
+4. Go have Pointers such as C and C#
 
 ## Useful Resources
 
@@ -97,3 +100,244 @@ func compileTime() {
 ```
 
 ## Collections Types
+
+If you don't have the data at declaring stage, you can use the build in `make()` function
+
+```Go
+func usingMake() {
+	statePopulation := make(map[string]int)
+	a := make([]int, 3)
+}
+```
+
+- Arrays
+
+This syntax represent creating an array with the same number of elements as in the initializing
+
+```Go
+func main() {
+	grades := [...]int{97, 85, 93}
+	fmt.Println("Grades ", grades)
+	fmt.Println("Grades ", len(grades))
+}
+```
+
+This syntax represent creating an array with specific number of elements
+
+```Go
+func main() {
+	grades := [4]int
+	fmt.Println("Grades ", grades)
+```
+
+This syntax represent coping an array, shallow copy not as a reference
+
+a will hold the same value, and it will not be effected by the change in b
+
+b will hold a copy from a
+
+to override this behavior, we should use this symbol (&) before the assigning, its called **_address off operator_**
+
+c will point to a in the memory, hench changing in c will affect a
+
+```Go
+func main() {
+	a := [...]int{1, 2, 3}
+	b := a
+	c := &a
+	b[1] = 5
+	fmt.Println(a)
+	fmt.Println(b)
+}
+```
+
+- Slice
+
+Having an array with fixed size at compile time, make it limited for usage that's why we are going to use Slice
+
+**Slice called reference type data**
+
+```Go
+func usingSlice() {
+	a := []int{1,2,3,4,5,6,7,8,9,10}
+	b := a[:] // Slice of all elements, same as the above array
+	b := a[3:] // Slice from the 4th element to end, [4,5,6,7,8,9,10]
+	b := a[:6] // Slice first 6 elements, [1,2,3,4,5,6]
+	b := a[3:6] // Slice the 4th, 5th and 6th element, [4,5,6]
+
+	// using spread operator to append new slice to this one
+
+	a = a.append(a, []int{11,12,13}...)
+}
+```
+
+- Maps
+
+Its like an object, key, value Pair
+
+Maps are reference type, such as Slice
+
+```Go
+func main() {
+	statePopulate := map[string]int{
+		"Jordan": 12345678,
+		"Egypt":  87654321,
+		"Syria":  34567789,
+	}
+	// This will print 0, since Jorda is not available in the map
+
+	fmt.Println(statePopulate["Jorda"])
+
+	// to prevent this to cause some confusion, we can use comma ok syntax
+	// , ok
+	// This will print 0 false, and we can check on the ok variable
+
+	prop, ok := statePopulate["Jorda"]
+	fmt.Println(prop, ok)
+}
+```
+
+- Struct
+
+Struct are value types, you can use the address operator again here
+
+Its a data type can hold multiple data types, not a good idea to be used from maintenance view, if you change the order or adding a new data type, you should fix this on all the other file that use this struct
+
+```Go
+type Doctor struct {
+	number     int
+	actorName  string
+	companions []string
+}
+
+func main() {
+	aDoctor := Doctor{
+		number:    3,
+		actorName: "Saif",
+		companions: []string{
+			"Liz Shaw",
+			"Jo Grant",
+		},
+	}
+
+	fmt.Println(aDoctor)
+}
+```
+
+You can use it as an anonymous struct, only @runtime, when this function is used the struct will be created and removed from memory when the job is done
+
+```Go
+func main() {
+	bDoctor := struct{ name string }{name: "Saif"}
+	fmt.Println(bDoctor)
+}
+```
+
+Struct doesn't support inheritance, but it support Composition
+
+```Go
+type Animal struct {
+	Name   string
+	Origin string
+}
+
+type Bird struct {
+	Animal
+	SpeedKPH float32
+	CanFly   bool
+}
+
+func something() {
+	b := Bird{}
+	b.Name = "Emu"
+	b.Origin = "Australia"
+	b.SpeedKPH = 48
+	b.CanFly = true
+
+	c := Bird{
+		Animal:   Animal{Name: "Emu", Origin: "Aus"},
+		SpeedKPH: 47,
+		CanFly:   false,
+	}
+}
+```
+
+## Conditions
+
+- If Statement
+
+General Syntax
+
+```Go
+/**
+	if decleration; (condition) {
+		whatever
+	}
+	*/
+```
+
+Example
+
+```Go
+func main() {
+	statePopulate := map[string]int{
+		"Jordan": 12345678,
+		"Egypt":  87654321,
+		"Syria":  34567789,
+	}
+
+	if pop, ok := statePopulate["Jordan"]; ok {
+		fmt.Println(pop)
+	}
+}
+```
+
+- Switch Statement
+
+```Go
+func switchStm() int {
+	switch 3 {
+	case 1, 2, 4:
+		return 1
+
+	case 3:
+		return 3
+
+	}
+	return 0
+}
+```
+
+## Loops
+
+Same as every loop ever, but we have something called Label
+
+This code will break the outer loop
+
+```Go
+func main() {
+Loop:
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 3; j++ {
+			fmt.Println(i * j)
+			if i*j >= 3 {
+				break Loop
+			}
+		}
+	}
+}
+```
+
+For Range Loop
+
+```Go
+array := []int{1, 2, 3}
+	for index, value := range array {
+		fmt.Println(index, value)
+	}
+
+	array := []int{1, 2, 3}
+	for _, value := range array {
+		fmt.Println( value)
+	}
+```
