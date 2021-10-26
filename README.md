@@ -341,3 +341,52 @@ array := []int{1, 2, 3}
 		fmt.Println( value)
 	}
 ```
+
+## Functions
+
+- Defer
+
+**Invoke** a function, but delay its execution to a specific time, the defer functions follow the Queue behavior
+
+Since the function is invoked, it will hold the values on time of invoking, not the time of execution, this code will print `Start`
+
+```Go
+func main() {
+	a := "Strart"
+	defer fmt.Println(a)
+	a = "End"
+}
+
+```
+
+Most used when you open a resource that needs to be closed such as reading file stream
+
+defer will move the block just before the function return, at it will execute according to LIFO
+
+```Go
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+)
+
+func main() {
+	res, err := http.Get("http://www.google.com/robots.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer res.Body.Close()
+	robots, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s", robots)
+}
+```
+
+- Panic
+
+- Recover
