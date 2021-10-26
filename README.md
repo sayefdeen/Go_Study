@@ -4,7 +4,7 @@
 
 Go is focusing in building servers and web applications, not client applications
 
-## Why using GO?
+## GO?
 
 1. Strong and statically language : It means the type of the variables can't change over time, all these variables have to be defined at compile time
 
@@ -19,6 +19,8 @@ Go is focusing in building servers and web applications, not client applications
    - Compile to standalone binaries
 
 4. Go have Pointers such as C and C#
+
+5. Go Have the concept on closures
 
 ## Useful Resources
 
@@ -342,7 +344,7 @@ array := []int{1, 2, 3}
 	}
 ```
 
-## Functions
+## KeyWords
 
 - Defer
 
@@ -387,6 +389,134 @@ func main() {
 }
 ```
 
-- Panic
+- Panic 🙀
+
+All panic statements happened after the defer statements executed
 
 - Recover
+
+The code below will be executed in this order
+
+- Start will print
+
+- about the panic will print
+
+- defer will delay the execution of anonymous function
+
+- panicker will panic, throwing an error Something bad happened
+
+- the defer function will executed
+
+- recover will return an error
+
+- the condition will be true
+
+- an error will be printed
+
+- End will be printed from main
+
+```Go
+import (
+	"fmt"
+	"log"
+)
+
+func main() {
+	fmt.Println("Start")
+	panicker()
+	fmt.Println("End")
+}
+
+func panicker() {
+	fmt.Println("about to panic")
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Error: ", err)
+			panic(err)
+		}
+	}()
+	panic("Something bad happened")
+	fmt.Println("done Panicking")
+}
+```
+
+In case We can't handle the error we can panic again 🙀
+
+## Pointers
+
+As we said, in go we use pointers to point to the variable reference such as C and C++
+
+We can't apply pointer arithmetic, which is applying math operators in the references values
+
+Slice and Maps for example, are by default using pointers in shadow
+
+- & reference operator
+
+```Go
+func main() {
+	a := []int{1, 2, 3}
+	b := a
+	fmt.Println(a, b)
+	a[1] = 42
+	fmt.Println(a, b)
+	greeting:= "Hello"
+	name := "Stacey"
+	sayGreeting(&greeting,&name)
+}
+
+func Maps() {
+	a := map[string]string{"foo": "bar", "baz": "buz"}
+	b := a
+	fmt.Println(a, b)
+	a["foo"] = "qux"
+	fmt.Println(a, b)
+}
+
+- * called a reference destruct, without it the reference representation will be printed instead of the value itself
+
+func sayGreeting(greeting *string, name *string) {
+	fmt.Println(*greeting, *name)
+	*name = "Ted"
+	fmt.Println(*name)
+}
+
+```
+
+## InterFaces
+
+Interfaces describe behaviors, store method definition
+
+```Go
+func main() {
+	var w Writer = ConsoleWriter{}
+	w.Write([]byte("Hello World"))
+}
+
+type Writer interface {
+	Write([]byte) (int, error)
+}
+
+type ConsoleWriter struct {
+}
+
+func (cw ConsoleWriter) Write(data []byte) (int, error) {
+	n, err := fmt.Println(string(data))
+	return n, err
+}
+```
+
+- Use many, Small Interfaces
+
+- Don't export interfaces fro types that will be consumed
+
+- Design functions and methods to receive interfaces whenever possible
+
+## Goroutines
+
+go keyword before the function, this will tell go to start a [greenThread](https://en.wikipedia.org/wiki/Green_threads) and run this function if this thread
+
+- Sync
+
+We can use the [sync](https://pkg.go.dev/sync@go1.17.2) package from go to handle all the goroutines to be synced
+
+## Channels
