@@ -515,8 +515,103 @@ func (cw ConsoleWriter) Write(data []byte) (int, error) {
 
 go keyword before the function, this will tell go to start a [greenThread](https://en.wikipedia.org/wiki/Green_threads) and run this function if this thread
 
+By default the calling of main method consider as a Goroutines, that has its own thread, once this thread is finished the program will exit, no matter how many Goroutines is working in background, to solve this problem we can use wait group, it will make the main routin waits until
+
+```Go
+func main() {
+	go count("Sheep")
+	count("Fish")
+}
+
+func count(thing string) {
+	for i := 1; true; i++ {
+		fmt.Println(thing)
+		time.Sleep(time.Millisecond * 500)
+	}
+}
+```
+
+This Main routine will wait till the count routine is finished
+
+```Go
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		count("Sheep")
+		wg.Done()
+	}()
+
+	wg.Wait()
+}
+```
+
+After Adding the Go keyword behind the first calling, go will call the first function in its own thread, and the second function will be invoked too.
+
 - Sync
 
 We can use the [sync](https://pkg.go.dev/sync@go1.17.2) package from go to handle all the goroutines to be synced
 
 ## Channels
+
+its a way for Goroutines to communicate with each other, sending and receiving messages are a blocking process, once you send a message the program will wait till a message is received.
+
+![Image]('./src/assets/img.png')
+
+This code will keep receiving a msg until the loop it done and the channel is closed
+
+```Go
+func main() {
+	c := make(chan string)
+	go count("Sheep", c)
+
+	for msg := range c {
+		fmt.Println(msg)
+	}
+}
+
+func count(thing string, c chan string) {
+	for i := 1; i <= 5; i++ {
+		c <- thing
+		time.Sleep(time.Millisecond * 500)
+	}
+
+	close(c)
+}
+```
+
+In this code snippet, c1 will wait till c2 msg in received, this will slow down our program, to solve this we have to use select statement
+
+```Go
+func main() {
+	c1 := make(chan string)
+	c2 := make(chan string)
+
+	go func() {
+		c1 <- "Every 500ms"
+		time.Sleep(time.Millisecond * 500)
+	}()
+
+	go func() {
+		for {
+			c2 <- "Every two seconds"
+			time.Sleep(time.Second * 2)
+		}
+	}()
+
+	for {
+		fmt.Println(<-c1)
+		fmt.Println(<-c2)
+	}
+
+	// this will solve the previous problem
+		for {
+		select {
+		case msg1 := <-c1:
+			fmt.Println(msg1)
+		case msg2 := <-c2:
+			fmt.Println(msg2)
+		}
+	}
+}
+```
